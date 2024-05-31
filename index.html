@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Таймер до полуночи</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: radial-gradient(circle, #ff00cc, #660066);
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            color: #fff;
+            text-shadow: 3px 3px 10px #000;
+            overflow: hidden;
+            position: relative;
+        }
+        #countdown {
+            font-size: 12vw;
+            background: rgba(255, 255, 255, 0.9);
+            color: #ff00cc;
+            padding: 5vw;
+            border-radius: 5vw;
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.7);
+            animation: bounce 0.5s infinite alternate, colorChange 1s infinite;
+        }
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-3vw); }
+        }
+        @keyframes colorChange {
+            0% { color: #ff00cc; }
+            25% { color: #ffff00; }
+            50% { color: #00ff00; }
+            75% { color: #00ffff; }
+            100% { color: #ff00cc; }
+        }
+        #birthdayMessage {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 8vw;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.9);
+            color: #ff00cc;
+            padding: 8vw;
+            border-radius: 8vw;
+            animation: spin 2s infinite linear, glow 1s infinite alternate;
+        }
+        #surpriseMessage {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 10vw;
+            color: #ff00cc;
+            text-shadow: 3px 3px 10px #000;
+            animation: jump 1s ease-out, rotate 2s linear infinite, pulse 2s infinite, bend 1s ease-in-out infinite;
+            z-index: 2;
+        }
+        #photoMessage {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 8vw;
+            color: #ff00cc;
+            text-shadow: 3px 3px 10px #000;
+            animation: jump 1s ease-out, rotate 2s linear infinite, pulse 2s infinite, bend 1s ease-in-out infinite;
+            z-index: 2;
+        }
+        #photoMessage img {
+            max-width: 90%;
+            max-height: 90vh;
+            border: 5px solid #ff00cc;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.7);
+        }
+        @keyframes spin {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        @keyframes glow {
+            from { box-shadow: 0 0 10px #ff00cc; }
+            to { box-shadow: 0 0 30px #ffff00; }
+        }
+        @keyframes jump {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        @keyframes rotate {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        @keyframes bend {
+            0%, 100% { transform: skew(0deg); }
+            50% { transform: skew(10deg); }
+        }
+        .fireworks {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .firework {
+            position: absolute;
+            width: 4vw;
+            height: 4vw;
+            background: radial-gradient(circle, yellow, red, transparent);
+            border-radius: 50%;
+            animation: explode 1s ease-out;
+        }
+        @keyframes explode {
+            from { transform: scale(0); opacity: 1; }
+            to { transform: scale(7); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+<div id="countdown">00:00:00</div>
+<div id="birthdayMessage">С Днём Рождения!</div>
+<div id="photoMessage">
+    <img src="foto.jpg" alt="Не грусти, малышка">
+    <div>Не грусти, малышка</div>
+</div>
+<div id="surpriseMessage">С Днём Рождения, Алиса!</div>
+<div class="fireworks"></div>
+
+<script>
+  function updateCountdown() {
+    const now = new Date();
+    const currentMonth = now.getUTCMonth();
+    const currentDate = now.getUTCDate();
+
+    if (currentMonth === 5 && currentDate === 1) {
+      document.getElementById("countdown").style.display = "none";
+      document.getElementById("birthdayMessage").style.display = "block";
+      startFireworks();
+      setTimeToHtml('00', '00', '00')
+      return;
+    }
+
+    const targetTime = new Date();
+    targetTime.setUTCHours(17, 0, 0, 0);
+    if (now.getUTCHours() >= 17) {
+      targetTime.setDate(targetTime.getDate() + 1);
+    }
+
+    const targetTimeInMS = targetTime.getTime();
+    const timeRemaining = targetTimeInMS - now.getTime();
+
+    const hours = Math.floor((timeRemaining / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((timeRemaining / (1000 * 60)) % 60);
+    const seconds = Math.floor((timeRemaining / 1000) % 60);
+
+    setTimeToHtml(hours, minutes, seconds)
+  }
+
+  const setTimeToHtml = (hours, minutes, seconds) => {
+    document.getElementById("countdown").innerText =
+      (hours < 10 ? '0' : '') + hours + ":" +
+      (minutes < 10 ? '0' : '') + minutes + ":" +
+      (seconds < 10 ? '0' : '') + seconds;
+  }
+
+  function startFireworks() {
+    const fireworksContainer = document.querySelector('.fireworks');
+    fireworksContainer.style.display = 'block';
+    document.getElementById("surpriseMessage").style.display = "block";
+    document.getElementById("photoMessage").style.display = "block";
+
+    for (let i = 0; i < 50; i++) { // Ограничиваем количество фейерверков до 50
+      const firework = document.createElement('div');
+      firework.className = 'firework';
+      firework.style.top = Math.random() * 100 + 'vh';
+      firework.style.left = Math.random() * 100 + 'vw';
+      firework.style.animationDelay = Math.random() + 's';
+      fireworksContainer.appendChild(firework);
+    }
+
+    // Останавливаем анимации через 10 секунд
+    setTimeout(() => {
+      document.getElementById("surpriseMessage").style.animation = "none";
+      document.getElementById("photoMessage").style.animation = "none";
+      fireworksContainer.innerHTML = '';
+      fireworksContainer.style.display = 'none';
+    }, 10000);
+  }
+
+  setInterval(updateCountdown, 1000);
+  updateCountdown(); // начальная установка
+</script>
+</body>
+</html>
